@@ -189,4 +189,4 @@ def create_fitted_model(is_first=False):
         json.dump(model.get_scores(), fp)
 
 
-create_fitted_model(is_first=True)
+# create_fitted_model(is_first=True)
