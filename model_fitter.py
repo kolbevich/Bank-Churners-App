@@ -19,7 +19,7 @@ class Model:
         self.training_set_path = training_set_path
         self.path = self.create_new_model_folder()
 
-    def create_new_model_folder(self, pathname=working_directory + r'\Models\Model', counter=0):
+    def create_new_model_folder(self, pathname=working_directory + r'/Models/Model', counter=0):
         if not os.path.exists(f'{pathname} {counter}'):
             os.makedirs(f'{pathname} {counter}')
             return f'{pathname} {counter}'
@@ -83,17 +83,17 @@ class Model:
 
 def get_current_training_set_info():
     max = 0
-    for file in os.listdir(working_directory + r'\Models'):
+    for file in os.listdir(working_directory + r'/Models'):
         if file.startswith("Model"):
             if int(file.split()[1]) > max:
                 max = int(file.split()[1])
-    training_set = pd.read_csv(f'{working_directory}\\Models\\Model {str(max)}\\Training_set.csv', sep=';',  encoding='utf-8')
+    training_set = pd.read_csv(f'{working_directory}/Models/Model {str(max)}/raining_set.csv', sep=';',  encoding='utf-8')
     return len(training_set)
 
 
 def get_current_model_name():
     max = 0
-    for file in os.listdir(working_directory + r'\Models'):
+    for file in os.listdir(working_directory + r'/Models'):
         if file.startswith("Model"):
             if int(file.split()[1]) > max:
                 max = int(file.split()[1])
@@ -108,11 +108,11 @@ def add_training_data(df):
 
 def get_current_model_scores():
     max = 0
-    for file in os.listdir(working_directory + r'\Models'):
+    for file in os.listdir(working_directory + r'/Models'):
         if file.startswith("Model"):
             if int(file.split()[1]) > max:
                 max = int(file.split()[1])
-    return pd.read_json(f'{working_directory}\\Models\\Model {str(max)}\\scores.json', typ='series')
+    return pd.read_json(f'{working_directory}/Models/Model {str(max)}/scores.json', typ='series')
 
 # def create_fitted_model() -> object:
 #     predictors = ['Total_Trans_Amt',
@@ -134,7 +134,7 @@ def get_current_model_scores():
 #     model.read_training_set()
 #     xgb_fitted = model.modelfit(xgbc, model.x_train, model.x_test, predictors)
 #
-#     pickle.dump(xgb_fitted, open(model.path + r'\attrition_clf.pkl', 'wb'))
+#     pickle.dump(xgb_fitted, open(model.path + r'/attrition_clf.pkl', 'wb'))
 #
 #     with open(model.path + r'\scores.json', "w") as fp:
 #         json.dump(model.get_scores(), fp)
@@ -183,7 +183,7 @@ def create_fitted_model(is_first=False):
     model.read_training_set()
     xgb_fitted = model.modelfit(xgbc, model.x_train, model.x_test, predictors)
 
-    pickle.dump(xgb_fitted, open(model.path + r'\attrition_clf.pkl', 'wb'))
+    pickle.dump(xgb_fitted, open(model.path + r'/attrition_clf.pkl', 'wb'))
 
     with open(model.path + r'\scores.json', "w") as fp:
         json.dump(model.get_scores(), fp)
