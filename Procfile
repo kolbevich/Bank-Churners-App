@@ -1,1 +1,1 @@
-web: streamlit run prediction-app.py
+web:sh setup.sh && streamlit run prediction-app.py
