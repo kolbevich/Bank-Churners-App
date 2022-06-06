@@ -1,5 +1,7 @@
 streamlit==1.9.2
 streamlit-option-menu==0.3.2
+pandas_profiling==3.1.0
+xgboost==1.6.1
 pandas==0.25.3
 numpy==1.18.1
 scikit-learn==0.22.1
