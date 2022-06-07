@@ -1,17 +1,14 @@
 # подумать над виджетами
 # взять обученную модель из пикл файла
 import os
-# Look to the path of your current working directory
-from random import randint
-
 import streamlit as st
 import streamlit_option_menu as option
 import pandas as pd
 import numpy as np
 import pickle
 from pandas_profiling import ProfileReport
-from streamlit.state import get_session_state
 from streamlit_pandas_profiling import st_profile_report
+import plotly.express as px
 import model_fitter
 from streamlit import legacy_caching
 
@@ -34,47 +31,55 @@ selected_page = option.option_menu(
 
 
 if selected_page == 'Model info':
-    st.write("""
-        # Here you can see training results of current model
-        # Also you can add new training data to improve the model
-        """)
 
-    st.write("Current model test results")
-    if st.button('Get'):
-        model_results = model_fitter.get_current_model_scores()
-        st.write(model_fitter.get_current_model_name())
-        st.write(model_results)
-        st.write("Press get to refresh")
-    else:
-        st.write('Press get to see results')
+    st.sidebar.header("Add new data to the training set to improve the model")
+    st.sidebar.header("And see results immediately!")
+    st.subheader("Here you can see training results of current XGBoost Classifier model")
 
-    st.write("Training set info")
-    if st.button('Info'):
-        set_info = model_fitter.get_current_training_set_info()
-        st.write('Training set file contains ', set_info, ' rows')
-        st.write("Press info to refresh")
-    else:
-        st.write('Press get to see results')
+    col1, col2 = st.columns(2)
 
-    uploaded_file = st.sidebar.file_uploader("Upload a data to add it in Training set", type=["csv"])
+    with col1:
 
-    if uploaded_file is not None:
-        input_df = pd.read_csv(uploaded_file, sep=';', encoding='utf-8')
-        # updating current
-        model_fitter.add_training_data(input_df)
-        # training new model on new current
-        new_model = model_fitter.create_fitted_model()
-        legacy_caching.clear_cache()
+        if st.button('Get current model test results'):
+            model_results = model_fitter.get_current_model_scores()
+            st.write(model_fitter.get_current_model_name())
+            st.write(model_results)
+            st.write("Press again to refresh")
+        else:
+            st.write('Press to see results')
+
+    with col2:
+        if st.button('Get training set info"'):
+            set_info = model_fitter.get_current_training_set_info()
+            st.write('Training set file contains ', set_info, ' rows')
+            st.write("Press info to refresh")
+        else:
+            st.write('Press get to see results')
+
+        uploaded_file = st.sidebar.file_uploader("Upload a data to add it in Training set", type=["csv"])
+
+        if uploaded_file is not None:
+            input_df = pd.read_csv(uploaded_file, sep=';', encoding='utf-8')
+            # updating current
+            model_fitter.add_training_data(input_df)
+            # training new model on new current
+            new_model = model_fitter.create_fitted_model()
+            legacy_caching.clear_cache()
 
 if selected_page == 'Make prediction':
 
     st.write("""
     # Bank Churners prediction
-    This app predicts whether the Bank customer leaves or not!
-    Data obtained from Kaggle
-
-    'Wont leave': 0, 'Will leave': 1
+    There is a powerful XGBoost classifier inside. It calculates whether customers will leave in next month or not.
+    Classes marks mean the following: 
+    - 0 : 'Wont leave': , 
+    - 1: 'Will leave'
+    
+    Learn more about the model by clicking on Model info button!
     """)
+
+
+
 
     st.sidebar.header('User Input Features')
 
@@ -103,20 +108,23 @@ if selected_page == 'Make prediction':
         input_df = user_input_features()
 
     df = input_df  # Selects only the first row (the user input data)
-
-    print(df)
-
     # Displays the user input features
     st.subheader('User Input features')
-
     if uploaded_file is not None:
         st.write(df)
     else:
-        st.write('Awaiting CSV file to be uploaded. Currently using example input parameters (shown below).')
+        st.write('Upload a CSV file to make multiple predictions at the time')
         st.write(df)
 
-    # Reads in saved classification model
-    load_clf = pickle.load(open(working_directory + r'/attrition_clf.pkl', 'rb'))
+    st.subheader('Model result')
+    st.caption('You can see classifier answers below. Categories correspond to probabilities range like so:\n')
+    st.caption('low  - client relates to class 1 with [0-0.2) confidence\n')
+    st.caption('average  - client relates to class 1 with [0.2-0.4) confidence\n')
+    st.caption('above average  - client relates to class 1 with [0.4-0.6) confidence\n')
+    st.caption('high - client relate to class 1 with [0.6-0.8) confidence\n')
+    st.caption('very  - client relate to class 1 with [0.8-0.1] confidence\n')
+    col1, col2 = st.columns(2)
+    load_clf = pickle.load(open(working_directory + r'\attrition_clf.pkl', 'rb'))
 
     # Apply model to make predictions
     prediction = load_clf.predict(df.drop(['CLIENTNUM'], axis=1))
@@ -127,7 +135,8 @@ if selected_page == 'Make prediction':
     def encode_proba(pp):
         df = pd.DataFrame(pp, columns=['0', '1'])
         df['Probability of leaving'] = 'Undefined'
-        df['Probability of leaving'] = np.where((df['1'] >= 0) & (df['1'] < 0.2), 'low', df['Probability of leaving'])
+        df['Probability of leaving'] = np.where((df['1'] >= 0) & (df['1'] < 0.2), 'low',
+                                                df['Probability of leaving'])
         df['Probability of leaving'] = np.where((df['1'] >= 0.2) & (df['1'] < 0.4), 'average',
                                                 df['Probability of leaving'])
         df['Probability of leaving'] = np.where((df['1'] >= 0.4) & (df['1'] < 0.6), 'above average',
@@ -141,23 +150,44 @@ if selected_page == 'Make prediction':
         return df
 
 
-    prediction_proba = encode_proba(prediction_proba)
-    prediction_proba['CLIENTNUM'] = df['CLIENTNUM']
-    prediction_proba.iloc[:, 0:2] = prediction_proba.iloc[:, 0:2].astype(float).round(4)
-    st.subheader('Prediction Probability')
-    st.write(prediction_proba)
+    with col2:
+        st.subheader('Pie chart of results')
+        prediction_proba = encode_proba(prediction_proba)
+        fig = px.pie(prediction_proba, names='Probability of leaving')
+        st.write(fig)
+    with col1:
+        st.subheader('Table view of results')
+        # Reads in saved classification model
 
-    cat_choice = None
-    cat_choice = st.selectbox('Filter predictions by probability of leaving',
-                              [None, 'low', 'average', 'above average', 'high', 'very high'])
-    if cat_choice is not None:
-        choice_result = prediction_proba[prediction_proba['Probability of leaving'] == cat_choice]
-        st.write(choice_result)
-    else:
-        pass
+
+
+        prediction_proba['CLIENTNUM'] = df['CLIENTNUM']
+        prediction_proba.iloc[:, 0:2] = prediction_proba.iloc[:, 0:2].astype(float).round(4)
+
+        st.write(prediction_proba)
+
+        cat_choice = None
+        cat_choice = st.selectbox('Filter predictions by probability of leaving',
+                                  [None, 'low', 'average', 'above average', 'high', 'very high'])
+        if cat_choice is not None:
+            choice_result = prediction_proba[prediction_proba['Probability of leaving'] == cat_choice]
+            st.write(choice_result)
+        else:
+            pass
+
+
+
+
+
+
+
+
 
 if selected_page == 'Analyze data':
-    with st.sidebar.header('1. Upload your CSV data'):
+
+    st.subheader("Create a user friendly EDA report with powerful Python tools!")
+    st.caption("Generating report usually takes about 2-3 minutes")
+    with st.sidebar.header('1. Upload your CSV data' ):
         uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
         st.sidebar.markdown("""
     [Example CSV input file](https://raw.githubusercontent.com/dataprofessor/data/master/delaney_solubility_with_descriptors.csv)
