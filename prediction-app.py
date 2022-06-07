@@ -52,9 +52,9 @@ if selected_page == 'Model info':
         if st.button('Get training set info"'):
             set_info = model_fitter.get_current_training_set_info()
             st.write('Training set file contains ', set_info, ' rows')
-            st.write("Press info to refresh")
+            st.write("Press again to refresh")
         else:
-            st.write('Press get to see results')
+            st.write('Press to see results')
 
         uploaded_file = st.sidebar.file_uploader("Upload a data to add it in Training set", type=["csv"])
 
