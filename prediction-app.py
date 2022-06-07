@@ -120,8 +120,8 @@ if selected_page == 'Make prediction':
     st.caption('You can see classifier answers below. Categories correspond to probabilities range like so:\n')
     st.caption('low  - client relates to class 1 with [0-0.2) confidence\n')
     st.caption('average  - client relates to class 1 with [0.2-0.4) confidence\n')
-    st.caption('above average  - client relates to class 1 with [0.4-0.6) confidence\n')
-    st.caption('high - client relate to class 1 with [0.6-0.8) confidence\n')
+    st.caption('above average  - client relates to class 1 with [0.4-0.5) confidence\n')
+    st.caption('high - client relate to class 1 with [0.5-0.8) confidence\n')
     st.caption('very  - client relate to class 1 with [0.8-0.1] confidence\n')
     col1, col2 = st.columns(2)
     load_clf = pickle.load(open(working_directory + r'/attrition_clf.pkl', 'rb'))
@@ -139,10 +139,10 @@ if selected_page == 'Make prediction':
                                                 df['Probability of leaving'])
         df['Probability of leaving'] = np.where((df['1'] >= 0.2) & (df['1'] < 0.4), 'average',
                                                 df['Probability of leaving'])
-        df['Probability of leaving'] = np.where((df['1'] >= 0.4) & (df['1'] < 0.6), 'above average',
+        df['Probability of leaving'] = np.where((df['1'] >= 0.4) & (df['1'] < 0.5), 'above average',
                                                 df['Probability of '
                                                    'leaving'])
-        df['Probability of leaving'] = np.where((df['1'] >= 0.6) & (df['1'] < 0.8), 'high',
+        df['Probability of leaving'] = np.where((df['1'] >= 0.5) & (df['1'] < 0.8), 'high',
                                                 df['Probability of leaving'])
         df['Probability of leaving'] = np.where((df['1'] >= 0.8) & (df['1'] <= 1), 'very high',
                                                 df['Probability of leaving'])
