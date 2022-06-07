@@ -124,7 +124,7 @@ if selected_page == 'Make prediction':
     st.caption('high - client relate to class 1 with [0.6-0.8) confidence\n')
     st.caption('very  - client relate to class 1 with [0.8-0.1] confidence\n')
     col1, col2 = st.columns(2)
-    load_clf = pickle.load(open(working_directory + r'\attrition_clf.pkl', 'rb'))
+    load_clf = pickle.load(open(working_directory + r'/attrition_clf.pkl', 'rb'))
 
     # Apply model to make predictions
     prediction = load_clf.predict(df.drop(['CLIENTNUM'], axis=1))
