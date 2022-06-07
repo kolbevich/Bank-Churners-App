@@ -72,7 +72,7 @@ if selected_page == 'Make prediction':
     # Bank Churners prediction
     There is a powerful XGBoost classifier inside. It calculates whether customers will leave in next month or not.
     Classes marks mean the following: 
-    - 0 : 'Wont leave': , 
+    - 0 : 'Wont leave'
     - 1: 'Will leave'
     
     Learn more about the model by clicking on Model info button!
