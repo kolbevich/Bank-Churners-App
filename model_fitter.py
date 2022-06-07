@@ -87,7 +87,7 @@ def get_current_training_set_info():
         if file.startswith("Model"):
             if int(file.split()[1]) > max:
                 max = int(file.split()[1])
-    training_set = pd.read_csv(f'{working_directory}/Models/Model {str(max)}/training_set.csv', sep=';',  encoding='utf-8')
+    training_set = pd.read_csv(f'{working_directory}/Models/Model {str(max)}/Training_set.csv', sep=';',  encoding='utf-8')
     return len(training_set)
 
 
