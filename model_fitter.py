@@ -10,8 +10,8 @@ from xgboost.sklearn import XGBClassifier
 
 working_directory = os.getcwd()
 
-ORIGINAL_TRAINING_DATASET_PATH = r'\Data\BankChurners_cleaned.csv'
-CURRENT_TRAINING_DATASET_PATH = r'\Data\Training_set.csv'
+ORIGINAL_TRAINING_DATASET_PATH = r'/Data/BankChurners_cleaned.csv'
+CURRENT_TRAINING_DATASET_PATH = r'/Data/Training_set.csv'
 
 
 class Model:
